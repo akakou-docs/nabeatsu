@@ -1,0 +1,1074 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+        <title>reveal.js</title>
+
+        <link rel="stylesheet" href="css/reveal.css">
+        <link rel="stylesheet" href="css/theme/black.css">
+
+        <!-- Theme used for syntax highlighting of code -->
+        <link rel="stylesheet" href="lib/css/zenburn.css">
+
+        <!-- Printing and PDF exports -->
+        <script>
+            var link = document.createElement( 'link' );
+            link.rel = 'stylesheet';
+            link.type = 'text/css';
+            link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+            document.getElementsByTagName( 'head' )[0].appendChild( link );
+        </script>
+    </head>
+    <body>
+        <div class="reveal">
+            <div class="slides">
+                <section 
+                    data-markdown
+                    data-separator="^\n---$"
+                    data-separator-vertical="^\n>>>$">
+
+# 最強(さいつよ)の
+# ナベアツを書く
+
+---
+# 自己紹介
+
+>>>
+## あかこう
+@akakou_py 
+
+セキュリティをやっているマン？
+![](https://pbs.twimg.com/profile_images/811407669894385664/8dQkt863_400x400.jpg)
+
+---
+# やったこと
+
+>>>
+# 最速の
+# ナベアツを作る
+
+>>>
+## どうなったら最速か
+## なんて分からないので
+
+>>>
+## とりあえず
+## ```gcc -Ofast```
+## で最適化したC言語に
+
+>>>
+# 実行速度で勝つ !
+
+>>>
+# Fight with GCC !
+# ( ᐛ )و ｸﾞｯ
+
+---
+# 経緯
+
+>>>
+# 割愛 (^^)
+
+---
+# ルール
+
+>>>
+### 1〜1000000までの数字をカウントし
+### 後述するフォーマットで表示
+
+>>>
+### カウントした数が3の倍数または、
+### 3のつく数だったらボケる
+
+>>>
+### ボケないときのフォーマットは
+# ```"%14d\n"```
+
+>>>
+### ボケるときのフォーマットは
+# ```"(BOKE)%8d\n"```
+
+---
+# &#92;ﾌｧｲｯ!/
+
+---
+
+# 相手のC言語
+# のコード
+
+>>>
+
+こんな感じ
+```
+#include &lt;stdio.h&gt;
+
+#define MAX 1000000 // カウント回数
+
+
+/** 
+ * @brief ボケるかを判定
+ * @param (value) カウントした値
+ * @return ボケるべきなら1、それ以外は0
+ */
+int should_say_joke(int value) {
+    int tmp;
+
+    // 3の倍数か判定
+    if (value % 3 == 0) {
+        // もし3で割った余りが
+        // 0ならば1を返す。
+        return 1;
+    }
+
+    // 3が桁に含まれる数か判定
+    while (value != 0) {
+        // 下位一桁を取得
+        tmp = value % 10;
+
+        // 取得した一桁が3であるか判定
+        if (tmp == 3) {
+            // もし3だったら1を返す
+            return 1;
+        }
+
+        // 値を10で割る
+        value /= 10;
+    }
+
+    // 何もヒットしなければ0を返す
+    return 0;
+}
+
+
+/**
+ * @brief カウントと表示を行う
+ */
+void main() {
+    int count;
+
+    // 1~MAXまでカウントする
+    for (count = 1; count &lt;= MAX; count++) {
+        if (should_say_joke(count)) {
+            // ボケる方の出力
+            printf("(BOKE)%8d\n", count);
+        } 
+        else {
+            // ボケない方の出力
+            printf("%14d\n", count);
+        }
+    }
+}
+```
+
+>>>
+
+とりあえず最初の部分
+
+```c
+#include &lt;stdio.h&gt;
+
+#define MAX 1000000 // カウント回数
+
+```
+
+>>>
+カウントした値がボケる値かを計算
+
+```c
+/** 
+ * @brief ボケるかを判定
+ * @param (value) カウントした値
+ * @return ボケるべきなら1、それ以外は0
+ */
+int should_say_joke(int value) {
+    int tmp;
+
+    // 3の倍数か判定
+    if (value % 3 == 0) {
+        // もし3で割った余りが
+        // 0ならば1を返す。
+        return 1;
+    }
+
+    // 3が桁に含まれる数か判定
+    while (value != 0) {
+        // 下位一桁を取得
+        tmp = value % 10;
+
+        // 取得した一桁が3であるか判定
+        if (tmp == 3) {
+            // もし3だったら1を返す
+            return 1;
+        }
+
+        // 値を10で割る
+        value /= 10;
+    }
+
+    // 何もヒットしなければ0を返す
+    return 0;
+}
+
+```
+
+>>>
+カウントと表示を行う
+
+```c
+/**
+ * @brief カウントと表示を行う
+ */
+ void main() {
+    int count;
+
+    // 1~MAXまでカウントする
+    for (count = 1; count &lt;= MAX; count++) {
+        if (should_say_joke(count)) {
+            // ボケる方の出力
+            printf("(BOKE)%8d\n", count);
+        } 
+        else {
+            // ボケない方の出力
+            printf("%14d\n", count);
+        }
+    }
+}
+```
+
+>>>
+### 特徴（？）
+* 可読性向上のために関数を分けた
+  * きっとインライン展開してくれるはず
+* かなり普通のアルゴリズム
+
+---
+# それに対して
+# アセンブリ
+
+>>>
+### こんな感じ
+
+```
+                                            ; 初期設定
+extern  printf                              ; printf関数を持ってくる
+
+; データセクション
+section .data                               ; printfで使うフォーマット
+    basic_fmt:    db "%14d", 10, 0          ; 普通の方
+    joke_fmt:     db "(BOKE)%8d", 10, 0     ; ボケる方
+; コードセクション
+section .text
+    global _start                           ; _startを指名
+
+
+; スタート
+_start:                                     ; メインのポイント
+                                            ; 必要な値の代入
+    push  rbp                               ; スタックフレームのセット
+    mov   r8, 1                             ; カウントの初期化
+
+                                            ; 1000000回ループする
+    mov   rcx, 1000000                      ; ループ回数の指定
+
+; 3の倍数か調べる
+CHECK_THREE_MULTIPLE:
+    mov   rdx, 0                            ; 除算 r8÷3(rbx)=rax...rdx
+    mov   rax, r8
+    mov   rbx, 3
+    div   rbx
+                                            ; printfに使うレジスタの値を指定のレジスタに移動
+    mov   rsi, r8                           ; 表示する値を指定のレジスタに置く
+
+    cmp   rdx, 0                            ; 除算のあまりと0を比較し
+    je    SET_JOKE_FMT                      ; 0ならSET_JOKE_FMTにジャンプ
+    mov   r9,  r8
+
+; 3がつく文字か調べる
+CHECK_IN_THREE:
+    mov   rdx, 0                            ; 除算 r9÷10(rbx)=rax...rdx
+    mov   rax, r9
+    mov   rbx, 10
+    div   rbx
+
+    mov   r9, rax                           ; 次のループで10で割られた後の数値をかけるようにする
+
+    cmp   rdx, 3                            ; 除算のあまりと3を比較し
+    je    SET_JOKE_FMT                      ; 0ならSET_JOKE_FMTにジャンプ
+    cmp   rax, 0                            ; 除算のあまりと0を比較し
+    jne   CHECK_IN_THREE                    ; 0じゃなければCHECK_IN_THREElにジャンプ
+
+    mov   rdi, basic_fmt                    ; printfのフォーマットをレジスタに置く
+
+; 数値とボケの表示
+PRINT:
+    push  rcx                               ; 必要なレジスタの値をスタックに避難
+    push  r8
+    mov   rax, 0                            ; 各レジスタを初期化
+    mov   rbx, 0
+    mov   rdx, 0
+
+    call  printf                            ; printfを呼ぶ
+
+    pop   r8                                ; スタックの値をレジスタに戻す
+    pop   rcx
+    inc   r8                                ; r8のカウントをすすめる
+
+    loop  CHECK_THREE_MULTIPLE              ; ループバック
+
+; 後処理
+_end:
+    pop   rbp                               ; スタックを戻す
+
+    ; プロセス終了
+    mov   rax, 1                            ; 返り値を1にする
+    mov   rbx, 0                            ; 終了ステータスコード
+    int   0x80                              ; システムコール
+
+; 3で割り切れる数字、もしくは３のつく数字がついたとき、呼び出される
+; printfのフォーマットのレジスタを変更する
+SET_JOKE_FMT:
+    mov   rdi, joke_fmt                     ; printfのフォーマットをレジスタに格納
+    jmp   PRINT
+```
+
+>>>
+各セクションの設定
+
+```
+; printfを持ってくる
+extern  printf
+
+; .dataを設定
+section .data
+    ; 各フォーマット 
+    ; 普通
+    basic_fmt: db "%14d", 10, 0
+    ; ボケる方
+    joke_fmt:  db "(BOKE)%8d", 10, 0
+
+; .textを設定
+section .text
+    global _start
+```
+
+>>>
+カウント、ループの設定
+
+```
+; スタート
+_start:
+    push  rbp
+
+    ; カウントの初期化
+    mov   r8, 1
+    ; ループ回数の指定
+    mov   rcx, 1000000
+```
+
+>>>
+3の倍数か調べる
+
+```
+; 3の倍数か調べる
+CHECK_THREE_MULTIPLE:
+    ; r8 / 3(rbx) = rax...rdx
+    mov   rdx, 0
+    mov   rax, r8
+    mov   rbx, 3
+    div   rbx
+
+    mov   rsi, r8
+
+    ; 除算の余りを0と比較し、
+    ; 0ならSET_JOKE_FMTにジャンプ
+    cmp   rdx, 0
+    je    SET_JOKE_FMT
+    mov   r9,  r8
+```
+
+>>>
+
+3がつく文字か調べる
+
+```
+; 3がつく文字か調べる
+CHECK_IN_THREE:
+    ; 除算 r9÷10(rbx)=rax...rdx
+    mov   rdx, 0
+    mov   rax, r9
+    mov   rbx, 10
+    div   rbx
+    ; 次のループで10で割られた後の数値をかけるようにする
+    mov   r9, rax
+
+    ; 除算のあまりと3を比較し
+    ; 0ならSET_JOKE_FMTにジャンプ
+    cmp   rdx, 3
+    je    SET_JOKE_FMT
+
+    ; 除算のあまりと0を比較し
+    ; 0ならSET_JOKE_FMTにジャンプ
+    cmp   rax, 0
+    jne   CHECK_IN_THREE
+    
+    ; printfのフォーマットをレジスタに置く
+    mov   rdi, basic_fmt
+```
+
+>>>
+数値とボケの表示
+
+```
+; 数値とボケの表示
+PRINT:
+    ; 必要なレジスタの値をスタックに避難
+    push  rcx                               
+    push  r8
+
+    ; 各レジスタを初期化
+    mov   rax, 0
+    mov   rbx, 0
+    mov   rdx, 0
+
+    ; printfを呼ぶ
+    call  printf
+
+    ; スタックの値をレジスタに戻す
+    pop   r8
+    pop   rcx
+
+    ; r8のカウントをすすめる
+    inc   r8
+
+    ; ループバック
+    loop  CHECK_THREE_MULTIPLE
+```
+
+>>>
+### 後処理
+
+```
+; 後処理
+_end:
+    ; スタックを戻す
+    pop   rbp
+
+    ; 終了
+    mov   rax, 1
+    mov   rbx, 0
+    int   0x80
+```
+
+>>>
+printfのフォーマットをボケる方に変更する
+
+```
+; 3で割り切れる数字、もしくは３のつく数字がついたとき、呼び出される
+; printfのフォーマットのレジスタを変更する
+SET_JOKE_FMT:
+mov   rdi, joke_fmt
+jmp   PRINT
+```
+
+>>>
+
+### 特徴（？）
+* かなり普通のアルゴリズム
+* ~~printfを使ったのは内緒だぞ~~
+
+---
+# 結果
+
+>>>
+# 負けた
+
+---
+# とりあえず
+# C言語の方
+
+>>>
+```
+$ gcc -Ofast c_lang.c -o c_lang
+$ time ./c_lang
+             1
+             2
+(BOKE)       3
+             .
+             .
+             .
+        999998
+(BOKE)  999999
+       1000000
+./c_lang  0.71s user 2.27s system 66% cpu 4.458 total
+```
+
+>>>
+## まぁ普通のC言語
+## の実行速度かな？
+
+---
+# それに対して
+# アセンブリの方
+
+>>>
+```
+$ nasm -f elf64 nabeatsu.s
+$ gcc nabeatsu.o -nostartfiles -no-pie
+$ time ./a.out
+             1
+             2
+(BOKE)       3
+             .
+             .
+             .
+        999998
+(BOKE)  999999
+       1000000
+./asm  0.75s user 2.26s system 66% cpu 4.548 total
+```
+
+>>>
+## 負けてるじゃねえか
+
+---
+# 僕じゃGCCには
+# 勝てないのか
+
+---
+# 原因を考えた
+
+>>>
+### こんなことを考えてみた
+* 普通にC言語と同じアルゴリズムでは  
+最適化には勝てない
+* printfを呼び出すのはまずいのでは
+
+---
+# Let's 二回戦
+
+>>>
+## ルール・C言語の方  
+## の変更はなし
+
+---
+# 変更後
+# アセンブリ
+
+>>>
+こうなりました☆
+```
+; nabeatsu.s
+; 最強のNABEATSU☆を目指す
+
+
+; コードセクション
+section .text
+    global _start                           ; _startを指名
+
+; スタート
+_start:
+                                            ; カウント用レジスタの初期化
+    mov r12, 1                              ; ボケるか判定用カウントレジスタ（普通にカウントする）
+    mov r13, 1                              ; 表示用カウントレジスタ（BCDでカウントする）
+
+; 3の倍数かをチェックする
+CHECK_THREE_MULTIPLE:
+    xor rdx, rdx
+                                            ; r12を3で割る
+    mov rax, r12                            ; r12/3(rbx) = rax...rdx
+    mov rbx, 3
+    div rbx
+
+    cmp rdx, 0                              ; 除算の余りと0を比較する
+    je SET_BOKE_FMT                         ; 0ならSET_BOKE_FMTにジャンプする
+
+    mov r9,  r12                            ; r12(ボケるか判定用カウントレジスタ)をr9（3を含む数値か判定用レジスタ）にコピー
+
+; 3のつく数字化をチェックする
+CHECK_IN_THREE:
+    xor rdx, rdx
+                                            ; r9を10で割る（左から1桁取り出す）
+    mov rax, r9                             ; r9/10 = rax...rdx(取り出した1桁)
+    mov rbx, 10
+    div rbx
+
+    mov r9, rax                             ; r9を10で割った値をr9に格納
+
+    cmp rdx, 3                              ; 除算の余りと3を比較する
+    je SET_BOKE_FMT                         ; 余りが0ならSET_BOKE_FMTにジャンプする
+
+    cmp rax, 0                              ; 除算のあまりと0を比較し
+    jne CHECK_IN_THREE                      ; 余りが0じゃなければCHECK_IN_THREEにジャンプする
+
+; 普通のフォーマット（数値のみを表示）をrbpに格納する。
+SET_BASIC_FMT:
+    mov rbp, basic_fmt                      ; rbpに数値のみ表示するフォーマットを格納する
+
+; 次の処理の準備 & `SET_BASIC_FMT`からのジャンプバック用ラベル
+READY_TO_SET_FMT_LOOP:
+    mov rax, r13                            ; rax(今回表示する値が入ってるレジスタ)にr13（表示用カウントレジスタ）の値をコピー
+    mov r15, 14                             ; r15に14（最大このプログラムの耐えられる最大桁数）
+    add r15, rbp                            ; rbpの値(指定したフォーマットの文字列)と最大値を足した値をr15（次に格納する文字のアドレス先）に格納
+
+; r13から1文字ずつ取り出す
+SET_FMT_LOOP:
+    dec r15                                 ; r15を1つ減算する
+    mov rbx, 0xF                            ; rbxに0xFを格納
+    and rbx, rax                            ; raxと0xFに論理積をかけることで、16進数での1桁分取り出し、rbxに格納
+    add rbx, 0x30                           ; rbxに格納された1桁の数値に0x30を足すことで、ASCIIの文字のデータにする
+    mov [r15], bl                           ; bl(rbxから1バイト分のデータ)をr15の持つアドレス先に書き込む
+    shr rax, 4                              ; 16進数におけるBCDでの1桁分右にシフトする。
+    jnz SET_FMT_LOOP                        ; raxが0になるまでSET_FMT_LOOPを回し続ける
+
+; 文字列を表示
+PRINT:
+    mov r14, rcx                            ; rcxの値をr14に退避
+
+    mov rcx, rbp                            ; メッセージのアドレス
+    mov rdx, 16                             ; メッセージの長さ
+    mov rbx, 1                              ; 標準出力を指定
+    mov rax, 4                              ; システムコール番号 (sys_write)
+    int 0x80                                ; 割り込み
+
+    mov rcx, r14                            ; r14に退避させた値をrcxに戻す
+
+; カウントをする
+COUNT:
+    inc r12                                 ; r12に1加算
+    inc r13                                 ; r13に1加算
+
+    mov r9, r13                             ; r9（繰り上がれてないか確認用レジスタ）にr13（表示用カウントレジスタ）をコピー
+    mov r11, 0xF                            ; r11に0xFを格納
+    xor r8, r8
+
+; 表示用カウントレジスタ(BCD)の桁上がりチェック
+CARRY_UP:
+                                            ; 各桁に0xAが含まれていないか確認し、含まれていたら`CARRY_UP_BCD`を呼ぶ
+    mov r10, 0xF                            ; r10に0xFを格納
+    and r10, r9                             ; r10にr9の右から1桁分を格納させる
+    cmp r10, 0xA                            ; r10（上の処理で取った1桁分）と0xA（BCDではありえない値）かを確認
+    je CARRY_UP_BCD                         ; r10が0xAなら繰り上がりをする
+
+                                            ; 二重繰り上がりが起きたときの処理
+    cmp r10, 0xB                            ; r10に0xBが格納されていないかを確認
+    je CARRY_UP_BCD                         ; r10が0xBなら繰り上がりをする（0xC以上は理論上ありえない）
+
+; 次のカウント後の処理へジャンプする
+LOOP_BACK:
+    cmp r12, 1000001                        ; 最大カウント回数（100000）とr12（通常カウント）を比較
+    jne CHECK_THREE_MULTIPLE                ; 同じになるまでCHECK_THREE_MULTIPLEに戻る
+
+; 終了処理
+FIN:
+                                            ; プロセス終了
+    mov rax, 1                              ; 返り値を1にする
+    mov rbx, 0                              ; 終了ステータスコード
+    int 0x80                                ; システムコール
+
+; 表示用カウントレジスタ(BCD)の桁上がり処理
+CARRY_UP_BCD:
+    or r13, r11                             ; うまく繰り上がれてない値(r13)の、繰り上がれてない部分をすべて二進数の1で埋めて
+    inc r13                                 ; 1を足す → 強制的に繰り上がらせる
+
+    or r9, 0xF                              ; r9（繰り上がれてないか確認用レジスタ）の方も
+    inc r9                                  ; 繰り上がりしておく（ここで二重繰り上がりの可能性あり）
+
+    shr r9, 4                               ; r9の値を右に1文字分（16進数ひと桁分）シフトする
+    shl r11, 4                              ; `CARRY_UP_BCD`で使う対象以下の2進数での桁を1で埋めたもの（マスク）を更新する
+    or r11, 0xF
+
+    jmp CARRY_UP                            ; `CARRY_UP`に戻る
+
+; ボケるときのフォーマットをrbpに格納
+SET_BOKE_FMT:
+    mov rbp, joke_fmt                       ; rbpにボケたときのメッセージフォーマットを格納
+    jmp READY_TO_SET_FMT_LOOP               ; `READY_TO_SET_FMT_LOOP`にジャンプする（戻る）
+
+
+; データセクション
+section  .data                              ; データセクションの定義
+    joke_fmt  db "(BOKE)        "           ; joke_fmtの内容
+    db 0xD,0xA
+    times 20 db 0x00
+
+    basic_fmt db "              " ,         ; basic_fmtの内容
+    db 0xD, 0xA
+    times 20 db 0x00
+```
+
+>>>
+初期設定
+
+```
+; .textを設定
+section .text
+    global _start
+
+; 各カウント用レジスタを初期化
+_start:
+    ; 普通のカウント用
+    mov r12, 1
+    ; 表示のカウント用
+    mov r13, 1
+```
+
+>>>
+3の倍数かをチェック
+
+```
+; 3の倍数かをチェックする
+CHECK_THREE_MULTIPLE:
+    xor rdx, rdx
+
+    ; r12/3(rbx) = rax...rdx
+    mov rax, r12                            
+    mov rbx, 3
+    div rbx
+
+    ; 除算の余りを0と比較し、
+    ; 0ならSET_BOKE_FMTにジャンプする
+    cmp rdx, 0
+    je SET_BOKE_FMT
+
+    ; r12(ボケるか判定用カウントレジスタ)を
+    ; r9（3を含む数値か判定用レジスタ）にコピー
+    mov r9,  r12
+```
+
+>>>
+3のつく数字かをチェックする
+
+```
+; 3のつく数字かをチェックする
+CHECK_IN_THREE:
+    xor rdx, rdx
+
+    ; r9/10 = rax...rdx(取り出した1桁)
+    mov rax, r9
+    mov rbx, 10
+    div rbx
+
+    ; r9を10で割った値をr9に格納
+    mov r9, rax
+
+    ; 除算の余りと3を比較する
+    ; 余りが0ならPRINT_にジャンプする
+    cmp rdx, 3
+    je SET_BOKE_FMT
+
+    ; 除算のあまりと0を比較し
+    ; 余りが0じゃなければCHECK_IN_THREEにジャンプする
+    cmp rax, 0
+    jne CHECK_IN_THREE
+```
+
+>>>
+普通のフォーマットをrbpに格納
+
+```
+; 普通のフォーマット（数値のみを表示）をrbpに格納する。
+SET_BASIC_FMT:
+    mov rbp, basic_fmt
+```
+
+>>>
+表示する文字列を生成
+
+```
+; 次の処理の準備 & `SET_BASIC_FMT`
+; からのジャンプバック用ラベル
+READY_TO_SET_FMT_LOOP:
+    ; rax(今回表示する値が入ってるレジスタ)に
+    ; r13（表示用カウントレジスタ）の値をコピー
+    mov rax, r13
+    ; r14に14（最大このプログラムの耐えられる最大桁数）を格納
+    mov r15, 14
+    ; rbpの値(指定したフォーマットの文字列)と
+    ; 最大値を足した値をr15（次に格納する文字のアドレス先）に格納
+    add r15, rbp
+
+; r13から1文字ずつ取り出す
+SET_FMT_LOOP:
+    ; r15を1つ減算する
+    dec r15
+    ; rbxに0xFを格納
+    mov rbx, 0xF
+    ; raxと0xFに論理積をかけることで、
+    ; 16進数での1桁分取り出し、rbxに格納
+    and rbx, rax
+    ; rbxに格納された1桁の数値に0x30を足すことで、
+    ; ASCIIの文字のデータにする
+    add rbx, 0x30
+    ; bl(rbxから1バイト分のデータ)を
+    ; r15の持つアドレス先に書き込む
+    mov [r15], bl
+    ; 16進数におけるBCDでの1桁分右にシフトする。
+    shr rax, 4
+    ; raxが0になるまでSET_FMT_LOOPを回し続ける
+    jnz SET_FMT_LOOP
+```
+
+>>>
+文字列を表示
+
+```
+; 文字列を表示
+PRINT:
+    ; rcxの値をr14に退避
+    mov r14, rcx
+
+    ; メッセージのアドレス
+    mov rcx, rbp
+    ; メッセージの長さ
+    mov rdx, 16
+    ; 標準出力を指定
+    mov rbx, 1
+    ; システムコール番号 (sys_write)
+    mov rax, 4
+    ; 割り込み
+    int 0x80
+
+    ; r14に退避させた値をrcxに戻す
+    mov rcx, r14
+```
+
+>>>
+カウントをする
+
+```
+; カウントをする
+COUNT:
+    ; 通常カウント用のレジスタと
+    ; 表示カウント用のレジスタを加算
+    inc r12
+    inc r13
+
+    ; r9（繰り上がれてないか確認用レジスタ）に
+    ; r13（表示用カウントレジスタ）をコピー
+    mov r9, r13
+    
+    ; r11に0xFを格納
+    mov r11, 0xF
+
+    xor r8, r8
+```
+
+>>>
+表示用カウントレジスタ(BCD)の桁上がりチェック
+
+```
+; 表示用カウントレジスタ(BCD)の桁上がりチェック
+CARRY_UP:
+    ; 各桁に0xAが含まれていないか確認し、
+    ; 含まれていたら`CARRY_UP_BCD`を呼ぶ
+    mov r10, 0xF
+    and r10, r9
+    cmp r10, 0xA
+    je CARRY_UP_BCD
+
+    ; 二重繰り上がりが起きたときの処理
+    cmp r10, 0xB
+    ; r10が0xBなら繰り上がりをする（0xC以上は理論上ありえない）
+    je CARRY_UP_BCD
+```
+
+>>>
+次のカウント後の処理へジャンプする
+
+```
+; 次のカウント後の処理へジャンプする
+LOOP_BACK:
+    cmp r12, 1000000                        ; 最大カウント回数（100000）とr12（通常カウント）を比較
+    jne CHECK_THREE_MULTIPLE                ; 同じになるまでCHECK_THREE_MULTIPLEに戻る
+```
+
+>>>
+終了処理
+
+```
+; 終了処理
+FIN:
+                                            ; プロセス終了
+    mov rax, 1                              ; 返り値を1にする
+    mov rbx, 0                              ; 終了ステータスコード
+    int 0x80
+```
+
+>>>
+表示用カウントレジスタ(BCD)の桁上がり処理
+
+```
+; 表示用カウントレジスタ(BCD)の桁上がり処理
+CARRY_UP_BCD:
+    or r13, r11                             ; うまく繰り上がれてない値(r13)の、繰り上がれてない部分をすべて二進数の1で埋めて
+    inc r13                                 ; 1を足す → 強制的に繰り上がらせる
+
+    or r9, 0xF                              ; r9（繰り上がれてないか確認用レジスタ）の方も
+    inc r9                                  ; 繰り上がりしておく（ここで二重繰り上がりの可能性あり）
+
+    shr r9, 4                               ; r9の値を右に1文字分（16進数ひと桁分）シフトする
+    shl r11, 4                              ; `CARRY_UP_BCD`で使う対象以下の2進数での桁を1で埋めたもの（マスク）を更新する
+    or r11, 0xF
+
+    jmp CARRY_UP                            ; `CARRY_UP`に戻る
+```
+
+>>>
+ボケるときのフォーマットをrbpに格納
+
+```
+; ボケるときのフォーマットをrbpに格納
+SET_BOKE_FMT:
+    ; rbpにボケたときのメッセージフォーマットを格納して、
+    ; `READY_TO_SET_FMT_LOOP`にジャンプする（戻る）
+    mov rbp, joke_fmt
+    jmp READY_TO_SET_FMT_LOOP
+```
+
+>>>
+.dataを設定
+
+```
+; .dataを設定
+section  .data                              ; データセクションの定義
+    joke_fmt  db "(BOKE)        "           ; joke_fmtの内容
+    db 0xD,0xA
+    times 20 db 0x00
+
+    basic_fmt db "              " ,         ; basic_fmtの内容
+    db 0xD, 0xA
+    times 20 db 0x00
+```
+
+>>>
+### 特徴（？）
+* カウント用レジスタを２つ使用
+  * 判定用
+  * 表示用(BCDを使用)
+* 直接sys_writeを読んだ
+  * 脱printf
+* 極力実行時間の短そうな命令を選んだ
+  * inc、xor、shr、shl
+
+---
+# 結果
+
+---
+# C言語の方
+
+>>>
+
+```
+$ gcc -Ofast c_lang.c -o c_lang
+$ time ./c_lang
+             1
+             2
+(BOKE)       3
+             .
+             .
+             .
+        999998
+(BOKE)  999999
+       1000000
+./c_lang  0.71s user 2.18s system 66% cpu 4.369 total
+```
+
+>>>
+
+# うん
+# 変わらん
+
+---
+
+# では
+# アセンブリ
+
+>>>
+
+```
+$ nasm -f elf64 nabeatsu.s
+$ ld -s -o a.out nabeatsu.o
+$ time ./a.out
+             1
+             2
+(BOKE)       3
+             .
+             .
+             .
+        999998
+(BOKE)  999999
+       1000000
+./asm  0.32s user 2.03s system 58% cpu 3.996 total
+```
+
+>>>
+# KTKR
+
+>>>
+# KTKR!
+
+>>>
+# KTKR!!
+
+>>>
+## YEAHEEEEEEEEEE!!!!!!!!!
+## &#92; (^ ^) /
+
+---
+# まとめ
+
+>>>
+## とりあえず勝った
+
+>>>
+## 人はGCCの最適化を超えられる
+
+>>>
+# が
+
+>>>
+なぜか虚しい
+
+>>>
+## ので
+
+>>>
+## 皆さんも最強の
+## ナベアツ目指して
+
+>>>
+# ~~一緒に犠牲者~~
+# ~~になろう~~
+
+---
+# THANK YOU 
+# FOR LISTENING
+
+>>>
+## #さいつよナベアツ
+## #一緒に犠牲者になろう
+
+                </section>
+            </div>
+        </div>
+
+        <script src="lib/js/head.min.js"></script>
+        <script src="js/reveal.js"></script>
+
+        <script>
+            // More info about config & dependencies:
+            // - https://github.com/hakimel/reveal.js#configuration
+            // - https://github.com/hakimel/reveal.js#dependencies
+            Reveal.initialize({
+                dependencies: [
+                    { src: 'plugin/markdown/marked.js' },
+                    { src: 'plugin/markdown/markdown.js' },
+                    { src: 'plugin/notes/notes.js', async: true },
+                    { src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+                ]
+            });
+        </script>
+    </body>
+</html>
