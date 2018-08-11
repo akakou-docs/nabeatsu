@@ -555,6 +555,7 @@ $ time ./a.out
 ---
 # 変更後
 # アセンブリ
+(スライドに載せたコードは、バトル後に更に最適化されてます)
 
 >>>
 こうなりました☆
@@ -582,52 +583,52 @@ CHECK_THREE_MULTIPLE:
     div rbx
 
     cmp rdx, 0                              ; 除算の余りと0を比較する
-    je SET_BOKE_FMT                         ; 0ならSET_BOKE_FMTにジャンプする
+    je SET_BOKE_FMT                         ; 0ならprint_abnomalにジャンプする
 
     mov r9,  r12                            ; r12(ボケるか判定用カウントレジスタ)をr9（3を含む数値か判定用レジスタ）にコピー
 
 ; 3のつく数字化をチェックする
+READY_CHECK_IN_THREE:
+    mov r8, r13
+
 CHECK_IN_THREE:
-    xor rdx, rdx
-                                            ; r9を10で割る（左から1桁取り出す）
-    mov rax, r9                             ; r9/10 = rax...rdx(取り出した1桁)
-    mov rbx, 10
-    div rbx
+    mov rbx, 0xF                            ; rbxに0xFを格納
+    and rbx, r8                             ; r8と0xFに論理和をかけることで、16進数での1桁分取り出し、rbxに格納
 
-    mov r9, rax                             ; r9を10で割った値をr9に格納
+    shr r8,  4                              ; 16進数におけるBCDでの1桁分右にシフトする。
 
-    cmp rdx, 3                              ; 除算の余りと3を比較する
-    je SET_BOKE_FMT                         ; 余りが0ならSET_BOKE_FMTにジャンプする
+    cmp rbx, 3                              ; シフトの余りと3を比較する
+    je SET_BOKE_FMT                         ; 余りが0ならprint_abnomalにジャンプする
 
-    cmp rax, 0                              ; 除算のあまりと0を比較し
-    jne CHECK_IN_THREE                      ; 余りが0じゃなければCHECK_IN_THREEにジャンプする
+    cmp r8, 0                               ; 除算のあまりと0を比較し
+    jne CHECK_IN_THREE                      ; 余りが0ならprint_abnomalにジャンプする
 
 ; 普通のフォーマット（数値のみを表示）をrbpに格納する。
-SET_BASIC_FMT:
-    mov rbp, basic_fmt                      ; rbpに数値のみ表示するフォーマットを格納する
+SET_NOMAL_FORMAT:
+    mov rbp, normal_message                 ; rbpに数値のみ表示するフォーマットを格納する
 
-; 次の処理の準備 & `SET_BASIC_FMT`からのジャンプバック用ラベル
-READY_TO_SET_FMT_LOOP:
+; 次の処理の準備 & `SET_NOMAL_FORMAT`からのジャンプバック用ラベル
+READY_TO_SET_FORMAT_LOOP:
     mov rax, r13                            ; rax(今回表示する値が入ってるレジスタ)にr13（表示用カウントレジスタ）の値をコピー
-    mov r15, 14                             ; r15に14（最大このプログラムの耐えられる最大桁数）
+    mov r15, 15                             ; r15に15（最大このプログラムの耐えられる最大桁数）
     add r15, rbp                            ; rbpの値(指定したフォーマットの文字列)と最大値を足した値をr15（次に格納する文字のアドレス先）に格納
 
 ; r13から1文字ずつ取り出す
-SET_FMT_LOOP:
+SET_FORMAT_LOOP:
     dec r15                                 ; r15を1つ減算する
     mov rbx, 0xF                            ; rbxに0xFを格納
-    and rbx, rax                            ; raxと0xFに論理積をかけることで、16進数での1桁分取り出し、rbxに格納
+    and rbx, rax                            ; raxと0xFに論理和をかけることで、16進数での1桁分取り出し、rbxに格納
     add rbx, 0x30                           ; rbxに格納された1桁の数値に0x30を足すことで、ASCIIの文字のデータにする
     mov [r15], bl                           ; bl(rbxから1バイト分のデータ)をr15の持つアドレス先に書き込む
     shr rax, 4                              ; 16進数におけるBCDでの1桁分右にシフトする。
-    jnz SET_FMT_LOOP                        ; raxが0になるまでSET_FMT_LOOPを回し続ける
+    jnz SET_FORMAT_LOOP                     ; raxが0になるまでSET_FORMAT_LOOPを回し続ける
 
 ; 文字列を表示
 PRINT:
     mov r14, rcx                            ; rcxの値をr14に退避
 
     mov rcx, rbp                            ; メッセージのアドレス
-    mov rdx, 16                             ; メッセージの長さ
+    mov rdx, 17                             ; メッセージの長さ
     mov rbx, 1                              ; 標準出力を指定
     mov rax, 4                              ; システムコール番号 (sys_write)
     int 0x80                                ; 割り込み
@@ -641,7 +642,6 @@ COUNT:
 
     mov r9, r13                             ; r9（繰り上がれてないか確認用レジスタ）にr13（表示用カウントレジスタ）をコピー
     mov r11, 0xF                            ; r11に0xFを格納
-    xor r8, r8
 
 ; 表示用カウントレジスタ(BCD)の桁上がりチェック
 CARRY_UP:
@@ -657,7 +657,7 @@ CARRY_UP:
 
 ; 次のカウント後の処理へジャンプする
 LOOP_BACK:
-    cmp r12, 1000001                        ; 最大カウント回数（100000）とr12（通常カウント）を比較
+    cmp r12, 1000000                        ; 最大カウント回数（100000）とr12（通常カウント）を比較
     jne CHECK_THREE_MULTIPLE                ; 同じになるまでCHECK_THREE_MULTIPLEに戻る
 
 ; 終了処理
@@ -683,85 +683,46 @@ CARRY_UP_BCD:
 
 ; ボケるときのフォーマットをrbpに格納
 SET_BOKE_FMT:
-    mov rbp, joke_fmt                       ; rbpにボケたときのメッセージフォーマットを格納
-    jmp READY_TO_SET_FMT_LOOP               ; `READY_TO_SET_FMT_LOOP`にジャンプする（戻る）
+    mov rbp, boke_message                   ; rbpにボケたときのメッセージフォーマットを格納
+    jmp READY_TO_SET_FORMAT_LOOP            ; `READY_TO_SET_FORMAT_LOOP`にジャンプする（戻る）
 
 
 ; データセクション
 section  .data                              ; データセクションの定義
-    joke_fmt  db "(BOKE)        "           ; joke_fmtの内容
-    db 0xD,0xA
+    boke_message  db 0xA, "(BOKE)          "    ; boke_messageの内容
     times 20 db 0x00
 
-    basic_fmt db "              " ,         ; basic_fmtの内容
-    db 0xD, 0xA
+    normal_message db 0xA, "                "   ; normal_messageの内容
     times 20 db 0x00
-```
-
->>>
-初期設定
-
-```
-; .textを設定
-section .text
-    global _start
-
-; 各カウント用レジスタを初期化
-_start:
-    ; 普通のカウント用
-    mov r12, 1
-    ; 表示のカウント用
-    mov r13, 1
-```
-
->>>
-3の倍数かをチェック
-
-```
-; 3の倍数かをチェックする
-CHECK_THREE_MULTIPLE:
-    xor rdx, rdx
-
-    ; r12/3(rbx) = rax...rdx
-    mov rax, r12                            
-    mov rbx, 3
-    div rbx
-
-    ; 除算の余りを0と比較し、
-    ; 0ならSET_BOKE_FMTにジャンプする
-    cmp rdx, 0
-    je SET_BOKE_FMT
-
-    ; r12(ボケるか判定用カウントレジスタ)を
-    ; r9（3を含む数値か判定用レジスタ）にコピー
-    mov r9,  r12
 ```
 
 >>>
 3のつく数字かをチェックする
 
 ```
+; 普通のフォーマット（数値のみを表示）をrbpに格納する。
 ; 3のつく数字かをチェックする
+READY_CHECK_IN_THREE:
+    mov r8, r13
+
 CHECK_IN_THREE:
-    xor rdx, rdx
+    ; rbx(一桁分の値) = r8(BCDカウント) & 0xF
+    mov rbx, 0xF
+    and rbx, r8
 
-    ; r9/10 = rax...rdx(取り出した1桁)
-    mov rax, r9
-    mov rbx, 10
-    div rbx
+    ; r8(BCDカウント) = r8(BCDカウント) >> 4
+    shr r8,  4
 
-    ; r9を10で割った値をr9に格納
-    mov r9, rax
-
-    ; 除算の余りと3を比較する
-    ; 余りが0ならPRINT_にジャンプする
-    cmp rdx, 3
+    ; 一桁分の値と3を比較し
+    ; 3ならSET_BOKE_FMTにジャンプする
+    cmp rbx, 3
     je SET_BOKE_FMT
 
     ; 除算のあまりと0を比較し
     ; 余りが0じゃなければCHECK_IN_THREEにジャンプする
-    cmp rax, 0
+    cmp r8, 0
     jne CHECK_IN_THREE
+
 ```
 
 >>>
@@ -851,8 +812,6 @@ COUNT:
     
     ; r11に0xFを格納
     mov r11, 0xF
-
-    xor r8, r8
 ```
 
 >>>
@@ -951,6 +910,7 @@ section  .data                              ; データセクションの定義
   * 脱printf
 * 極力実行時間の短そうな命令を選んだ
   * inc、xor、shr、shl
+* (当初は10で割った値が3であるかを比較してましたが、最新版の上記コードではシフトして実装してます)
 
 ---
 # 結果

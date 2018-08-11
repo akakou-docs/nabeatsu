@@ -1,0 +1,3 @@
+[submodule "src/most_update"]
+	path = src/least
+	url = https://github.com/akakou-hobby/nabeatsu.s
